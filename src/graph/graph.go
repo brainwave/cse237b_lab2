@@ -59,6 +59,7 @@ func ConstructGraph(graphConfig *config.GraphConfig) *Graph {
 	// Parse the topology to construct the graph
 	for nodeName, nodeConfig := range graphConfig.Topology {
 		// Check whether this node has been created
+
 		node, ok := graph.Nodes[nodeName]
 		if !ok {
 			// If not, create a new one
@@ -71,7 +72,7 @@ func ConstructGraph(graphConfig *config.GraphConfig) *Graph {
 			}
 			graph.Nodes[nodeName] = node
 		}
-
+		log.Println("nodeConfig inputs: ", nodeConfig.Inputs)
 		/*
 			To be completed:
 			1. Initialize the newly created nodes;
