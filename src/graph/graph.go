@@ -36,7 +36,7 @@ func (g *Graph) InitAllNode() {
 }
 
 func (g *Graph) Start() {
-	sourceChannel <- Message{}
+	sourceChannel <- Message{1}
 }
 
 func (g *Graph) WaitEnd() {
@@ -72,12 +72,32 @@ func ConstructGraph(graphConfig *config.GraphConfig) *Graph {
 			}
 			graph.Nodes[nodeName] = node
 		}
-		log.Println("nodeConfig inputs: ", nodeConfig.Inputs)
-		/*
-			To be completed:
-			1. Initialize the newly created nodes;
-			2. Create channels that are necessary for data communication.
-		*/
+
+		//Adding dynamically read paths
+
+		//If node is source, set the boolean flag and configure only outputs
+		//If node is drain, set the boolean flag and configure only inputs
+		//Otherwise, configure no flags but both inputs and ouputs
+		
+		switch node.Name {
+		case "source":
+			node.IsSource = true
+			node.Outputs = nodeConfig.Outputs
+
+		case "drain":
+			node.IsDrain = true
+			node.Inputs = nodeConfig.Inputs
+
+		default:
+			node.Inputs = nodeConfig.Inputs
+			node.Outputs = nodeConfig.Outputs
+		}
+		for ipNodeName := range node.Inputs {
+			channels[ipNodeName+"-"+node.Name] = make(chan Message)
+		}
+		for opNodeName := range node.Outputs {
+			channels[node.Name+"-"+opNodeName] = make(chan Message)
+		}
 	}
 
 	return graph

@@ -8,7 +8,7 @@
         },
         "a": {
             "inputs": {
-                "source": 1
+                "source": 1 
             },
             "outputs": {
                 "b": 3
