@@ -1,33 +1,56 @@
 package main
 
 import (
-	"config"
-	"graph"
-	"log"
-)
-
-const (
-	CONFIG_PATH = "./config.json"
+	"fmt"
+	"task"
+	"time"
 )
 
 func main() {
-	log.Printf("Start DataFlow")
+	apps := []*task.App{}
 
-	// load the configration file
-	topology, err := config.ParseGraphConfig(CONFIG_PATH)
-	if err != nil {
-		log.Fatal(err)
+	// Task specifications
+	taskSpecs := []task.TaskSpec{
+		task.TaskSpec{
+			Period:           4 * time.Second,
+			TotalRunTimeMean: 1 * time.Second,
+			TotalRunTimeStd:  300 * time.Millisecond,
+			RelativeDeadline: 3 * time.Second,
+		},
+		task.TaskSpec{
+			Period:           2 * time.Second,
+			TotalRunTimeMean: 1 * time.Second,
+			TotalRunTimeStd:  300 * time.Millisecond,
+			RelativeDeadline: 2 * time.Second,
+		},
 	}
 
-	// Construct the graph processing engine from topology
-	g := graph.ConstructGraph(topology)
+	// Create all applications
+	for i, taskSpec := range taskSpecs {
+		apps = append(apps, task.NewApp(fmt.Sprintf("app%d", i), taskSpec))
+	}
 
-	// Initialize all nodes, create goroutines
-	g.InitAllNode()
+	/*
+		// Create and initialize the scheduler
+		sched := scheduler.NewScheduler()
+		// To be implemented, initialization process
 
-	// Trigger the source node to start processing
-	g.Start()
+		// Start the scheduler
+		sched.Start()
 
-	// Wait for the drain node finishing processing
-	g.WaitEnd()
+		// Start all applications
+		for _, app := range apps {
+			app.Start()
+		}
+
+		time.Sleep(c.TEST_TIME)
+
+		// Stop all applications
+		for _, app := range apps {
+			app.Stop()
+		}
+
+		// Stop the scheduler
+		sched.Stop()
+	*/
 }
